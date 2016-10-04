@@ -38,22 +38,34 @@ def get_sub_mods_df(subs):
     return df
     
 default_subs_mods = get_sub_mods_df(subs)
-
+default_subs_mods.to_csv('default_subs_mods.csv')
 
 def get_repeat_names(df):
     x = df.groupby('name')['name'].count()
     x.sort(ascending=False)
     return x[x>1]
-    
+
+default_subs_mods = pd.read_csv('default_subs_mods.csv')
+
 # GET REPEAT DEFAULT MODS
 x = default_subs_mods.groupby('name')['name'].count()
 x.sort(ascending=False)
 repeat_default_mods= x[x>1]
+repeat_default_mods.to_csv('repeat_default_mods.csv')
+single_default_mods = x[x==1]
 
 # GET DEFAULT CREATORS (OR OLDEST MODERATORS AT LEAST)
-first_mods = df[df.index == 0]
+first_mods = default_subs_mods[default_subs_mods.index == 0]
 repeat_first_mods = get_repeat_names(first_mods)
 
-# ATTEMPTING TO GET ALL DEFAULT MODS
+# GET ENTRIES FOR REPEAT MODS ONLY
+names = list(repeat_default_mods.index)
+df = default_subs_mods[default_subs_mods['name'].isin(names)] #not sure if this is right!!!!
+df = df[['name','subreddit']].sort('name')
+df['value'] = 1
+df = df.pivot(index='name', columns='subreddit', values='value')
+df = df.fillna(value=0)  
+df.to_csv('mod_by_sub_matrix.csv')
 
-                   
+# TRYING TO CREATE MATRICES TO GRAPH NETWORKS OF CO-MODERATING
+mod_sub_matrix = df.as_matrix()             
