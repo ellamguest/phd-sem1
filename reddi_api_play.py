@@ -23,7 +23,7 @@ r = requests.get('https://www.reddit.com/user/{}/comments/.json'.format(username
 data = r.json()
 print data.keys()
 
-def get_user_trophies(user)
+def get_user_trophies(user):
 trophies = requests.get('https://www.reddit.com/user/{}/trophies/.json'.format('qgyh2'),
                         headers=headers)
 trophies_data = trophies.json()
