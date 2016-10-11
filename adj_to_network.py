@@ -50,7 +50,9 @@ M.remove_nodes_from(nx.isolates(M))
 nx.draw(M,with_labels=True)
 
 S.remove_nodes_from(nx.isolates(S))
-nx.draw(S, with_labels=True)
+
+d = nx.degree(S)
+nx.draw(S, with_labels=True, node_size=[v * 100 for v in d.values()])
 
 
 # get all moderators, not just originals
