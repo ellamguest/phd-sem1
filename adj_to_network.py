@@ -47,10 +47,36 @@ for x in nx.isolates(S):
     
 # removing isolates from graph
 M.remove_nodes_from(nx.isolates(M))
-
-nx.draw(M)
-nx.draw(M, labels=M_names)
+nx.draw(M,with_labels=True)
 
 S.remove_nodes_from(nx.isolates(S))
-nx.draw(S)
-nx.draw(S, labels=S_names)
+nx.draw(S, with_labels=True)
+
+
+# get all moderators, not just originals
+df = pd.read_csv('default_subs_mods.csv')
+df['value'] = 1
+sub_mod_matrix = df.pivot('subreddit', 'name','value')
+a = np.matrix(sub_mod_matrix)
+a = np.nan_to_num(a)
+a = np.dot(a,np.transpose(a))
+np.fill_diagonal(a,0)
+G=nx.from_numpy_matrix(a)
+G_names = get_index_names_dict(sub_mod_matrix)
+nx.relabel_nodes(G,G_names,copy=False)
+nx.draw(G, with_labels=True)
+
+df = pd.read_csv('default_subs_mods.csv')
+df['value'] = 1
+mod_sub_matrix = df.pivot('name','subreddit', 'value')
+a = np.matrix(mod_sub_matrix)
+a = np.nan_to_num(a)
+a = np.dot(a,np.transpose(a))
+np.fill_diagonal(a,0)
+G2=nx.from_numpy_matrix(a)
+G2_names = get_index_names_dict(mod_sub_matrix)
+nx.relabel_nodes(G2,G2_names,copy=False)
+
+nx.draw(G2, with_labels=True)
+
+
