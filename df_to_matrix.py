@@ -11,6 +11,7 @@ import pandas as pd
 
 df = pd.read_csv('default_subs_mods.csv')
 df['value'] = 1
+df.drop_duplicates('subreddit', inplace=True) # get first moderators
 
 mod_sub_matrix = df.pivot('name', 'subreddit', 'value')
 sub_mod_matrix = df.pivot('subreddit', 'name','value')

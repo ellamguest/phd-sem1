@@ -34,4 +34,6 @@ cols = df.columns.tolist()
 #cols = [cols[8]] + cols[:8] + cols[9:]
 df = df[[cols[8]] + cols[:8] + cols[9:]]
 
+df.to_csv('default_subs.csv', header=True, index=True, encoding='utf-8')
+
 print df.head()

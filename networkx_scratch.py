@@ -52,7 +52,7 @@ plt.ylabel('clustering coefficient')
 plt.show()
 
 # identify nodes by clustering coefficent
- x = nx.clustering(G)
+x = nx.clustering(G)
 for key,value in x.iteritems():
     if value == 1.0:
         print key
