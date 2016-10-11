@@ -18,6 +18,23 @@ mod_sub_matrix = df.pivot('name', 'subreddit', 'value')
 sub_mod_matrix = df.pivot('subreddit', 'name','value')
 
 
+# save and open files
+df = pd.DataFrame(M, index=mod_sub_matrix.index, columns=mod_sub_matrix.index)
+df.to_csv('modxmod.csv', index=True, header=True)
+df2 = pd.DataFrame(S, index=sub_mod_matrix.index, columns=sub_mod_matrix.index)
+df2.to_csv('subxsub.csv', index=True, header=True)
+
+df = pd.read_csv('modxmod.csv', index_col=0)
+df2 = pd.read_csv('subxsub.csv', index_col=0)
+
+# convert incidence matrices to adjacency
+A = np.matrix(df)
+A = np.nan_to_num(A)
+AT = np.matrix(df2)
+AT = np.nan_to_num(AT)
+M = np.dot(A,AT) # 2372 x 2372 mods
+S = np.dot(AT,A) # 49 x 49 subs
+
 # create mapping dict to relabel nodes
 def get_index_names_dict(df):
     '''takes df where index is list of names
@@ -26,26 +43,9 @@ def get_index_names_dict(df):
     for i in range(len(df.index)):
         d[i] = df.index[i]
     return d
-S_names = get_index_names_dict(sub_mod_matrix)
-M_names = get_index_names_dict(mod_sub_matrix)
 
-
-# convert incidence matrices to adjacency
-A = np.matrix(mod_sub_matrix)
-A = np.nan_to_num(A)
-AT = np.matrix(sub_mod_matrix)
-AT = np.nan_to_num(AT)
-M = np.dot(A,AT) # 2372 x 2372 mods
-S = np.dot(AT,A) # 49 x 49 subs
-
-# save and open files
-df = pd.DataFrame(M, index=mod_sub_matrix.index, columns=mod_sub_matrix.index)
-df.to_csv('modxmod.csv', index=True, header=True)
-df2 = pd.DataFrame(S, index=sub_mod_matrix.index, columns=sub_mod_matrix.index)
-df2.to_csv('subxsub.csv', index=True, header=True)
-
-df = pd.read_csv('modxmod.csv')
-df2 = pd.read_csv('subxsub.csv')
+M_names = get_index_names_dict(df)
+S_names = get_index_names_dict(df2)
 
 '''
 np.savetxt('modxmod.csv',M, fmt='%1.0f',delimiter=',')
