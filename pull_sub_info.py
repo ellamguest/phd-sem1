@@ -9,6 +9,7 @@ import requests
 import pandas as pd
 from json_to_df import df, headers
 
+# df = pd.read_csv('default_subs.csv', index_col=0)
 subs = df['display_name']
 
 def pull_sub_data(subreddit, datatype):
