@@ -5,9 +5,10 @@ Created on Wed Oct 12 14:55:02 2016
 @author: msrareg3
 """
 
-import networkx as nx
 import numpy as np
 import pandas as pd
+import networkx as nxs
+from networkx.algorithms import bipartite
 
 # import weighted adj matrices, convert into graphs
 df = pd.read_csv('modxmod.csv', index_col=0)
