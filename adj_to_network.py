@@ -52,7 +52,7 @@ nx.draw(M,with_labels=True)
 S.remove_nodes_from(nx.isolates(S))
 
 d = nx.degree(S)
-nx.draw(S, with_labels=True, node_size=[v * 100 for v in d.values()])
+nx.draw(S, with_labels=True), node_size=[v * 100 for v in d.values()])
 
 
 # get all moderators, not just originals
@@ -66,7 +66,9 @@ np.fill_diagonal(a,0)
 G=nx.from_numpy_matrix(a)
 G_names = get_index_names_dict(sub_mod_matrix)
 nx.relabel_nodes(G,G_names,copy=False)
-nx.draw(G, with_labels=True)
+
+d = nx.degree(G)
+nx.draw(G, with_labels=True), node_size=[v * 25 for v in d.values()])
 
 df = pd.read_csv('default_subs_mods.csv')
 df['value'] = 1
@@ -79,6 +81,6 @@ G2=nx.from_numpy_matrix(a)
 G2_names = get_index_names_dict(mod_sub_matrix)
 nx.relabel_nodes(G2,G2_names,copy=False)
 
-nx.draw(G2, with_labels=True)
+nx.draw(G2)
 
 

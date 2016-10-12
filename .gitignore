@@ -2,3 +2,4 @@ work_reddit_login.py
 *.txt
 *.csv
 *.pyc
+*.png

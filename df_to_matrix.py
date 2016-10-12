@@ -28,9 +28,9 @@ df = pd.read_csv('modxmod.csv', index_col=0)
 df2 = pd.read_csv('subxsub.csv', index_col=0)
 
 # convert incidence matrices to adjacency
-A = np.matrix(df)
+A = np.matrix(mod_sub_matrix)
 A = np.nan_to_num(A)
-AT = np.matrix(df2)
+AT = np.matrix(sub_mod_matrix)
 AT = np.nan_to_num(AT)
 M = np.dot(A,AT) # 2372 x 2372 mods
 S = np.dot(AT,A) # 49 x 49 subs
@@ -44,8 +44,8 @@ def get_index_names_dict(df):
         d[i] = df.index[i]
     return d
 
-M_names = get_index_names_dict(df)
-S_names = get_index_names_dict(df2)
+M_names = get_index_names_dict(mod_sub_matrix)
+S_names = get_index_names_dict(sub_mod_matrix)
 
 '''
 np.savetxt('modxmod.csv',M, fmt='%1.0f',delimiter=',')
@@ -68,7 +68,7 @@ nx.degree(S,'TwoXChromosomes')
 
 # drawing network
 nx.draw(S)
-nx.draw(S, labels=S_names)
+nx.draw(S, with_labels=True)
 
 # selecting main components only
 x = nx.connected_component_subgraphs(M)
