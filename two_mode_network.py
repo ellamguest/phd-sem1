@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 import networkx as nx
 from networkx.algorithms import bipartite
+from network_functions import get_node_mode_list
 
 # import weighted adj matrices, convert into graphs
 df = pd.read_csv('modxmod.csv', index_col=0)
@@ -45,16 +46,6 @@ m = (mod + sub) x (mod + sub)  (94 x 94)
 
 # m.to_csv('default_subs_mods_2mode.csv')
 
-def get_node_mode_dict(nodes):
-    d = {}
-    for node in nodes:
-        if node in list(df['name'].unique()):
-            d[node] = 'mod'
-        elif node in list(df['subreddit'].unique()):
-            d[node] = 'sub'
-        else:
-            print 'Error: node not found in mod or sub list!'
-    return d
 
 d = get_node_mode_dict(list(m.index))
 
@@ -73,26 +64,13 @@ nx.relabel_nodes(M,M_names,copy=False)
 nx.set_node_attributes(M, 'mode', d)
 
 
-def get_node_mode_list(nodes):
-    n = []
-    for node in nodes:
-        if node in list(df['name'].unique()):
-            n.append(1)
-        elif node in list(df['subreddit'].unique()):
-            n.append(2)
-        else:
-            print 'Error: node not found in mod or sub list!'
-    return n
 
 n = get_node_mode_list(list(M.nodes()))
 
 nx.draw(M, node_color=n, with_labels=True)
 
 # attempting to import as edgelist
-from networkx.algorithms import bipartite
-
 df = pd.read_csv('default_subs_mods.csv')
-df = df.head(50)
 df['value'] = 1
 
 B = nx.Graph()
@@ -100,16 +78,21 @@ B.add_nodes_from(list(df['name'].unique()), bipartite=0)
 B.add_nodes_from(list(df['subreddit'].unique()), bipartite=1)
 B.add_weighted_edges_from(zip(list(df['name']),list(df['subreddit']),list(df['value'])))
 
-mod_nodes, sub_nodes = bipartite.sets(B)
+#mod_nodes, sub_nodes = bipartite.sets(B)
 
-X, Y = bipartite.sets(B)
-pos = dict()
-pos.update( (n, (1, i)) for i, n in enumerate(X) ) # put nodes from X at x=1
-pos.update( (n, (2, i*10)) for i, n in enumerate(Y) ) # put nodes from Y at x=2
-nx.draw(B, with_labels=True)
-plt.show()
+#==============================================================================
+# n = get_node_mode_list(df,list(B.nodes()))
+# nx.draw(B, with_labels=True, node_color=n)
+#==============================================================================
 
-n = get_node_mode_list(list(B.nodes()))
-plt.ion()
-nx.draw(B, with_labels=True, node_color=n)
-plt.show()
+
+# only look at nodes with degree > 1
+con = []
+for key, value in B.degree().iteritems():
+     if value >2:
+         con.append(key)
+
+C = B.subgraph(con)
+n = get_node_mode_list(df,list(C.nodes()))
+nx.draw(C, with_labels=True, node_color=n)
+
