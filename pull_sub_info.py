@@ -56,7 +56,7 @@ repeat_default_mods.to_csv('repeat_default_mods.csv')
 single_default_mods = x[x==1]
 
 # GET DEFAULT CREATORS (OR OLDEST MODERATORS AT LEAST)
-first_mods = default_subs_mods[default_subs_mods.index == 0]
+first_mods = get_repeat_names
 repeat_first_mods = get_repeat_names(first_mods)
 
 # GET ENTRIES FOR REPEAT MODS ONLY

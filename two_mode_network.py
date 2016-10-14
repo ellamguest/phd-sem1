@@ -10,15 +10,20 @@ import pandas as pd
 import networkx as nx
 from networkx.algorithms import bipartite
 from network_functions import get_node_mode_list
+from pull_sub_info import get_repeat_names
 
 # import weighted adj matrices, convert into graphs
 df = pd.read_csv('modxmod.csv', index_col=0)
 df2 = pd.read_csv('subxsub.csv', index_col=0)
 
 df = pd.read_csv('default_subs_mods.csv')
-df= df[df['Unnamed: 0']==0] # get oldest mod
-df = df[['name','subreddit']]
+# df= df[df['Unnamed: 0']==0] # get oldest mod
+orgs = list(df[df['Unnamed: 0']==0]['name'].unique())
+df = df.loc[df['name'].isin(orgs)]
 df['value'] = 1
+m = df.pivot('name','subreddit','value').fillna(0)
+# df = df[['name','subreddit']]
+
 
 names = list(df['name'].unique()) + list(df['subreddit'].unique())
 
@@ -88,7 +93,7 @@ B.add_weighted_edges_from(zip(list(df['name']),list(df['subreddit']),list(df['va
 
 # only look at nodes with degree > 1
 con = []
-for key, value in B.degree().iteritems():
+for key, value in M.degree().iteritems():
      if value >2:
          con.append(key)
 
