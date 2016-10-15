@@ -13,7 +13,7 @@ def get_index_names_dict(df):
     for i in range(len(df.index)):
         d[i] = df.index[i]
     return d
-
+Í
 
 df = pd.read_csv('default_subs_mods.csv')
 orgs = list(df[df['Unnamed: 0']==0]['name'].unique())
