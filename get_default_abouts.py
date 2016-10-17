@@ -37,7 +37,6 @@ df = pd.read_csv('default_abouts.csv', index_col=0)
 
 
 # PULL MODERATOR INFO FROM SUBREDDIT ABOUT
-query = '/about/moderators.json'
 subs = df['display_name']
 
 def pull_sub_data(subreddit):
@@ -60,5 +59,16 @@ def pull_mod_names(subreddits):
     return df
 
 df['mods'] = df['display_name'].map(pull_mod_names(subs))
+
+
+BASE_URL = 'https://www.reddit.com/r/'
+query = '/about/moderators.json'
+url = BASE_URL + subs[0] + query
+r = requests.get(url, headers=headers)
+data = r.json()
+for i in range len(data['data']['children']):
+    info = data['data']['children'][i]
+
+https://www.reddit.com/r/gadgets/about/moderators.json
     
 df.to_csv('default_abouts.csv', encoding= 'utf-8')
