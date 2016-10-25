@@ -12,7 +12,7 @@ import pandas as pd
 # COLLECT DEFAULT SUBREDDIT ABOUT INF0
 
 BASE_URL = 'https://www.reddit.com/'
-query = 'subreddits/default.json'
+query = 'subreddits/default/.json?limit=50&after=nottheonion'
 url = BASE_URL + query
 headers={'User-agent':'wednesdaysguest bot 0.1'}
 
