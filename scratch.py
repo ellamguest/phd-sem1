@@ -5,7 +5,7 @@ Created on Tue Aug 29 11:57:29 2017
 @author: msrareg3
 """
 
-years = ['2015','2016','2017']
+years = ['2013','2014','2015','2016','2017']
 months = ["%.2d" % i for i in range(1, 13)]
 
 dates = []
