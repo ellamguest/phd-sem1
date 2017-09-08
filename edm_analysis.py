@@ -31,6 +31,7 @@ signatures.hist()
 
 
 proposers_dict = dict(zip(df.proposer_id, df.proposer))
+
 mps_dict = dict(zip(df.mp_id, df.mp))
 
 for name in proposers.head().index:
@@ -40,12 +41,42 @@ proposers['name'] = proposers.index.map(lambda x: proposers_dict[x])
 
 df.groupby('proposer_id')['1'].transform('count')
 
+mps17 = pd.read_csv('/Users/emg/Desktop/edms/mps.csv')
+mps15 = pd.read_csv('/Users/emg/Desktop/edms/mps_2015.csv')
+mps10 = pd.read_csv('/Users/emg/Desktop/edms/mps_2010.csv')
+mps05 = pd.read_csv('/Users/emg/Desktop/edms/mps_2005.csv')
+mps = pd.concat([mps17, mps15, mps10, mps05])
+mps['fullname'] = mps['Last name'] +', ' + mps['First name']
+mps_dict = dict(zip(mps['Person ID'], mps['fullname']))
+
+x = []
+for name in df['mp_id'].unique():
+    if name not in mps['Person ID'].unique():
+        x.append(name)
+print(len(x))
+
+mp_party_dict = dict(zip(mps['Person ID'], mps['Party']))
+
+missing_ids = ['Evennett, David', 'Rifkind, Malcolm', 
+ 'Iain', 'Mensch, Louise',
+  'Sawford, Andy', 'Thornton, Mike', 
+  'Tom, Elliott,', 'Olney, Sarah']
+
+id_errors = {'Evennet, David': 11408,
+'Rifkind, Malcolm': 11660,
+'Mensch, Louise': 24833,
+'Elliott, Tom': 13781}
+
+for k,v in id_errors.items():
+    df.ix[df['mp']==k, 'mp_id']=v
+
+skipped_mps = {'Sawford, Andy': 'Labour',
+'Thornton, Mike': 'Liberal Democrat',
+'Elliott, Tom':'UUP',
+'Olney, Sarah':'Liberal Democrat'}
 
 
-
-
-
-
+'''
 
 #### text analysis
 import re
@@ -122,18 +153,7 @@ cm.to_csv('/Users/emg/Desktop/edms/semantic-net.csv')
 mp = pd.read_csv('/Users/emg/Desktop/edms/hocl-ge2015-results-full.csv')
 
 
-mps17 = pd.read_csv('/Users/emg/Desktop/edms/mps.csv')
-mps15 = pd.read_csv('/Users/emg/Desktop/edms/mps_2015.csv')
-mps10 = pd.read_csv('/Users/emg/Desktop/edms/mps_2010.csv')
-mps05 = pd.read_csv('/Users/emg/Desktop/edms/mps_2005.csv')
-mps = pd.concat([mps17, mps15, mps10, mps05])
 
-mps['fullnames'] = mps['Last name'] +', ' + mps['First name']
-missing = []
-for name in df['mp'].unique():
-    if name not in mps['fullnames'].unique():
-        missing.append(name)
-print(len(missing))
 
 corrections = ['Donaldson, Jeffrey M.',
  'Rogerson, Dan',
