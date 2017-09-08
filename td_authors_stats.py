@@ -30,3 +30,8 @@ x['rank'] = x.groupby('author')['1'].transform('rank')
 x['month_count'] = x.groupby([x.time.dt.year, x.time.dt.month])['1'].transform('count')
 
 x['month'] = x.time.dt.to_period('M')
+
+
+df.groupby(df.date.dt.year).apply(lambda x: x.content.str.contains('feel').sum()/len(x)).plot.barh()
+
+df.groupby(df.date.dt.year).apply(lambda x: x.content.str.contains('feel')/len(x))
