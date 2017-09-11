@@ -10,36 +10,16 @@ import pandas as pd
 import numpy as np
 
 df = pd.read_csv('/Users/emg/Desktop/edms/edm-signatures-2010-2017.csv', index_col=0)
-df['1'] = 1
-df['proposer_count'] = df.groupby('proposer_id')['1'].transform('count')
-df['mp_sign_count'] = df.groupby('mp_id')['1'].transform('count')
+df.replace('Tom, Elliott,', 'Elliott, Tom', inplace=True)
+df.replace('Iain', 'McKenzie, Iain', inplace=True)
+df.replace(17340, 11408, inplace=True) # David Evennett id wrong
+df.replace(9005396, 13781, inplace=True) # Tom Elliott id wrong
+df.replace(9005986, 24833, inplace=True) # Louise Mensch id wrong
+df.replace(9006242, 25452, inplace=True) # Emma Little Pengelly id wrong
+df['mp_sign_count'] = df.groupby('mp_id')['id'].transform('count')
 
-# remove entries with issing names
-NA = [9006006, 9006217, 9006259, 9006256, 9006242,
-       9006239, 9006257, 9006219, 9006277, 9006208,
-       9006253]
-df.ix[df['mp_id'].isin(NA), 'mp'] = np.nan
+df.ix[df['mp_id']>9000000, 'mp'] = np.nan
 df.dropna(how='any', inplace=True)
-
-proposers = df.groupby('proposer_id').count()['mp_id'].copy()
-proposers.sort_values(inplace=True, ascending=False)
-proposers.hist()
-
-signatures = df.groupby('mp_id').count()['1'].copy()
-signatures.sort_values(inplace=True, ascending=False)
-signatures.hist()
-
-
-proposers_dict = dict(zip(df.proposer_id, df.proposer))
-
-mps_dict = dict(zip(df.mp_id, df.mp))
-
-for name in proposers.head().index:
-    print(proposers_dict[name])
-    
-proposers['name'] = proposers.index.map(lambda x: proposers_dict[x])
-
-df.groupby('proposer_id')['1'].transform('count')
 
 mps17 = pd.read_csv('/Users/emg/Desktop/edms/mps.csv')
 mps15 = pd.read_csv('/Users/emg/Desktop/edms/mps_2015.csv')
@@ -47,34 +27,37 @@ mps10 = pd.read_csv('/Users/emg/Desktop/edms/mps_2010.csv')
 mps05 = pd.read_csv('/Users/emg/Desktop/edms/mps_2005.csv')
 mps = pd.concat([mps17, mps15, mps10, mps05])
 mps['fullname'] = mps['Last name'] +', ' + mps['First name']
+
+### cross-checking ids & names
+names = df.drop_duplicates('mp')[['mp','mp_id']]
+
 mps_dict = dict(zip(mps['Person ID'], mps['fullname']))
+names['name'] = names['mp_id'].map(lambda x: mps_dict[x] if x in mps_dict.keys() else None).fillna(names['mp'])
 
-x = []
-for name in df['mp_id'].unique():
-    if name not in mps['Person ID'].unique():
-        x.append(name)
-print(len(x))
+d = dict(zip(mps['fullname'], mps['Person ID']))
+names['id'] = names['name'].map(lambda x: d[x] if x in d.keys() else None).fillna(names['mp_id'])
 
-mp_party_dict = dict(zip(mps['Person ID'], mps['Party']))
+mp_party_dict = dict(zip(mps['fullname'], mps['Party']))
+names['party'] = names['name'].map(lambda x: mp_party_dict[x] if x in mp_party_dict.keys() else None)
 
-missing_ids = ['Evennett, David', 'Rifkind, Malcolm', 
- 'Iain', 'Mensch, Louise',
-  'Sawford, Andy', 'Thornton, Mike', 
-  'Tom, Elliott,', 'Olney, Sarah']
 
-id_errors = {'Evennet, David': 11408,
-'Rifkind, Malcolm': 11660,
-'Mensch, Louise': 24833,
-'Elliott, Tom': 13781}
-
-for k,v in id_errors.items():
-    df.ix[df['mp']==k, 'mp_id']=v
-
+# mps not in the twfu datasets because they were in power betweens general elections
 skipped_mps = {'Sawford, Andy': 'Labour',
 'Thornton, Mike': 'Liberal Democrat',
-'Elliott, Tom':'UUP',
-'Olney, Sarah':'Liberal Democrat'}
+'Olney, Sarah':'Liberal Democrat',
+'McKenzie, Iain':'Labour'}
 
+for k,v in skipped_mps.items():
+    names.ix[names['mp']==k, 'party']=v
+
+df = pd.merge(df, names, on='mp', how='inner')
+
+
+subset = df[['name','id_y','party','title','text','signature_count','proposer','id_x']]
+subset.columns = ['name','mp_id','party','title','text','signature_count','proposer','motion_id']
+subset.mp_id = subset.mp_id.astype(int)
+
+subset.to_csv('/Users/emg/Desktop/edms/edm-signatures-clean.csv')
 
 '''
 
